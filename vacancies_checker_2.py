@@ -3,14 +3,22 @@ import urllib2
 from HTMLParser import HTMLParser
 
 vacancy_list_url = "http://spb.hh.ru/applicant/searchvacancyresult.xml?source=&text=&profArea=1&s=1.117&areaId=2&desireableCompensation=&compensationCurrencyCode=RUR&experience=&orderBy=2&searchPeriod=1&itemsOnPage=50"
+accepted_keywords = ['QA', 'test', 'Test', 'quality','Quality', u'\u0442\u0435\u0441\u0442', u'\u0422\u0435\u0441\u0442', u'\u043A\u0430\u0447\u0435\u0441\u0442\u0432']
 
 unfiltered_vac_names = []
 unfiltered_emp_names = []
 unfiltered_vac_links = []
 
+filtered_vac_names = []
+filtered_emp_names = []
+filtered_vac_links = []
+
 total_pages = 0
 total_vacancies = 0
 filtered_vacancies = 0
+
+junk_percent = 0
+new_percent = 0
 
 
 # create a custom HTML parser
@@ -74,27 +82,55 @@ def grabPage(pageURL, pageName):
 
 
 def grabVacancies():
-    nextPageURL = vacancy_list_url
-    nextPageName = 1
+    next_page_url = vacancy_list_url
+    next_page_name = 1
 
-    while nextPageURL is not None:
-        nextPageURL = grabPage(nextPageURL, int(nextPageName))
-        nextPageName += 1
+    while next_page_url is not None:
+        next_page_url = grabPage(next_page_url, int(next_page_name))
+        next_page_name += 1
 
     global total_pages
     global total_vacancies
-    total_pages = nextPageName - 1
+    total_pages = next_page_name - 1
     total_vacancies = len(unfiltered_vac_names)
+
+
+def filterVacancies():
+    print 'Filtering ...'
+
+    for i in range(total_vacancies):
+        is_accepted = False
+        for keyword in accepted_keywords:
+            pos = unfiltered_vac_names[i].find(keyword)
+            if pos > -1:
+                is_accepted = True
+                filtered_vac_names.append(unfiltered_vac_names[i])
+                filtered_vac_links.append(unfiltered_vac_links[i])
+                filtered_emp_names.append(unfiltered_emp_names[i])
+                print 'Accepted: ' + unfiltered_vac_names[i]
+                break
+        if is_accepted is False:
+            print 'Rejected: ' + unfiltered_vac_names[i]
+
+    global filtered_vacancies
+    filtered_vacancies = len(filtered_vac_names)
+
+    global junk_percent
+    junk_percent = int(100 * ( float(total_vacancies - filtered_vacancies) / total_vacancies ))
+
 
 
 
 if __name__ == '__main__':
     grabVacancies()
+    filterVacancies()
 
-    print '\nUnfiltered Vacacies:\n--------------------'
-    for i in range(len(unfiltered_emp_names)):
+    print '\nFiltered Vacacies:\n--------------------'
+    for i in range(filtered_vacancies):
         print 'Vacancy   %i'%i
-        print 'Name:     %s'%unfiltered_vac_names[i]
-        print 'Employer: %s'%unfiltered_emp_names[i]
-        print 'URL:      %s'%unfiltered_vac_links[i]
-    print '\nTotal unfiltered: %i vacancies on %i page(s)'%(total_vacancies, total_pages)
+        print 'Name:     %s'%filtered_vac_names[i]
+        print 'Employer: %s'%filtered_emp_names[i]
+        print 'URL:      %s'%filtered_vac_links[i]
+        print '---'
+    print '\nTotal\n    unfiltered: %i vacancies on %i page(s)'%(total_vacancies, total_pages)
+    print '    %i of %i vacancies were accepted (%i%% junk)' % (filtered_vacancies, total_vacancies, junk_percent)
