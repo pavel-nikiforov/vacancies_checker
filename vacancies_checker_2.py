@@ -29,7 +29,7 @@ class MyHTMLParser(HTMLParser):
         self.vacancies = []
         self.employers = []
         self.urls = []
-        self.nextPageURL = None
+        self.next_page_url = None
         HTMLParser.__init__(self)
 
     def handle_starttag(self, tag, attrs):
@@ -42,7 +42,7 @@ class MyHTMLParser(HTMLParser):
                 self.read_employer = 1
             if attrs[0] == ('class', 'b-pager__next-text m-active-arrow HH-Pager-Controls-Next'):
                 #print "Next Page URL:", attrs[1][1]
-                self.nextPageURL = 'http://spb.hh.ru' + attrs[1][1]
+                self.next_page_url = 'http://spb.hh.ru' + attrs[1][1]
 
     def handle_data(self, data):
         if self.read_vacancy == 1:
@@ -61,13 +61,13 @@ class MyHTMLParser(HTMLParser):
             unfiltered_vac_links.append(self.urls[i])
 
 
-def grabPage(pageURL, pageName):
-    print 'Getting page %s ... '%pageName,
-    f = urllib2.urlopen(pageURL)
+def grabPage(page_url, page_name):
+    print 'Getting page %s ... ' % page_name,
+    f = urllib2.urlopen(page_url)
     rcode = f.getcode()
-    print '%s'%rcode
+    print '%s' % rcode
     if rcode != 200:
-        print 'Can\'t reach page\n%s\n... terminating'%pageURL
+        print 'Can\'t reach page\n%s\n... terminating' % page_url
         sys.exit()
 
     content = f.read()
@@ -78,7 +78,7 @@ def grabPage(pageURL, pageName):
     parser.feed(dec_content)
     parser.fetch_result()
 
-    return parser.nextPageURL
+    return parser.next_page_url
 
 
 def grabVacancies():
@@ -127,10 +127,10 @@ if __name__ == '__main__':
 
     print '\nFiltered Vacacies:\n--------------------'
     for i in range(filtered_vacancies):
-        print 'Vacancy   %i'%i
-        print 'Name:     %s'%filtered_vac_names[i]
-        print 'Employer: %s'%filtered_emp_names[i]
-        print 'URL:      %s'%filtered_vac_links[i]
+        print 'Vacancy   %i' % i
+        print 'Name:     %s' % filtered_vac_names[i]
+        print 'Employer: %s' % filtered_emp_names[i]
+        print 'URL:      %s' % filtered_vac_links[i]
         print '---'
-    print '\nTotal\n    unfiltered: %i vacancies on %i page(s)'%(total_vacancies, total_pages)
+    print '\nTotal\n    unfiltered: %i vacancies on %i page(s)' % (total_vacancies, total_pages)
     print '    %i of %i vacancies were accepted (%i%% junk)' % (filtered_vacancies, total_vacancies, junk_percent)
