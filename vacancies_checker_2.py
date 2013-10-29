@@ -113,10 +113,10 @@ def filterVacancies(silent_mode = False):
                 filtered_vac_names.append(unfiltered_vac_names[i])
                 filtered_vac_links.append(unfiltered_vac_links[i])
                 filtered_emp_names.append(unfiltered_emp_names[i])
-                outcomes.append('Accepted: ' + unfiltered_vac_names[i])
+                outcomes.append('Accepted: ' + unfiltered_vac_names[i].encode('utf-8'))
                 break
         if is_accepted is False:
-            outcomes.append('Rejected: ' + unfiltered_vac_names[i])
+            outcomes.append('Rejected: ' + unfiltered_vac_names[i].encode('utf-8'))
 
     global filtered_vacancies
     filtered_vacancies = len(filtered_vac_names)
@@ -130,8 +130,8 @@ def filterVacancies(silent_mode = False):
         print '\nFiltered Vacacies:\n--------------------'
         for i in range(filtered_vacancies):
             print 'Vacancy   %i' % i
-            print 'Name:     %s' % filtered_vac_names[i]
-            print 'Employer: %s' % filtered_emp_names[i]
+            print 'Name:     %s' % filtered_vac_names[i].encode('utf-8')
+            print 'Employer: %s' % filtered_emp_names[i].encode('utf-8')
             print 'URL:      %s' % filtered_vac_links[i]
             print '---'
         print '\nTotal\n    unfiltered: %i vacancies on %i page(s)' % (total_vacancies, total_pages)
@@ -228,8 +228,8 @@ def dumpData():
 
     for vacancy in dumped_vacancies:
         print '---'
-        print 'vacancy:    ' + vacancy[1]
-        print 'employer:   ' + vacancy[0]
+        print 'vacancy:    ' + vacancy[1].encode('utf-8')
+        print 'employer:   ' + vacancy[0].encode('utf-8')
         print 'url:        ' + vacancy[2]
         print 'placed:     ' + vacancy[3]
         print 'updated:    ' + vacancy[4]
@@ -268,13 +268,13 @@ def dumpEmployers():
 
     for employer in dumped_employers:
         print 'id: %3i '%employer[0],
-        print 'name: %s'%employer[1]
+        print 'name: %s'%employer[1].encode('utf-8')
 
     print '\n\n%s employers in total'%len(dumped_employers)
     conn.close()
 
 
-def dumpUpdated(min_count = 1):
+def dumpUpdated(min_count=1):
     print 'Dumping data ...'
 
     if not isDatabaseOK():
@@ -320,8 +320,8 @@ def dumpUpdated(min_count = 1):
 
     for vacancy in updated_vacancies:
         print '---'
-        print 'vacancy:    ' + vacancy[1]
-        print 'employer:   ' + vacancy[0]
+        print 'vacancy:    ' + vacancy[1].encode('utf-8')
+        print 'employer:   ' + vacancy[0].encode('utf-8')
         print 'url:        ' + vacancy[2]
         print 'placed:     ' + vacancy[3]
         print 'updated:    ' + vacancy[4]
@@ -405,10 +405,10 @@ def storeNewVacancies():
 
         employer_id = cursor.fetchone()
         if employer_id is None:
-            print('New employer: %s' % filtered_emp_names[i])
+            print 'New employer: %s' % filtered_emp_names[i].encode('utf-8')
             cursor.execute(insert_employer, (filtered_emp_names[i],))
             conn.commit()
-            print '     vacancy: %s' % filtered_vac_names[i]
+            print '     vacancy: %s' % filtered_vac_names[i].encode('utf-8')
             print '     url:     %s' % filtered_vac_links[i]
             print '-------------'
             cursor.execute(insert_vacancy, (filtered_emp_names[i], filtered_vac_names[i], filtered_vac_links[i], today_date, today_date, 0))
@@ -422,10 +422,10 @@ def storeNewVacancies():
             vacancy_id = cursor.fetchone()
 
             if vacancy_id is None:
-                print 'New vacancy: %s' % filtered_vac_names[i]
+                print 'New vacancy: %s' % filtered_vac_names[i].encode('utf-8')
                 cursor.execute(insert_vacancy, (filtered_emp_names[i], filtered_vac_names[i], filtered_vac_links[i], today_date, today_date, 0))
                 conn.commit()
-                print('   employer: %s' % filtered_emp_names[i])
+                print '   employer: %s' % filtered_emp_names[i].encode('utf-8')
                 print '        url: %s' % filtered_vac_links[i]
                 print '------------'
                 new_vacancies += 1
