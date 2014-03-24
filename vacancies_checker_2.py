@@ -45,8 +45,9 @@ class MyHTMLParser(HTMLParser):
             if attrs[0][0] == 'href' and attrs[0][1].find('employer') == 1:
                 self.read_employer = 1
             if attrs[0] == ('class', 'b-pager__next-text m-active-arrow HH-Pager-Controls-Next'):
-                #print "Next Page URL:", attrs[1][1]
-                self.next_page_url = 'http://spb.hh.ru' + attrs[1][1]
+                #print "Next Page attrs:", attrs
+                #print "Next Page URL:", attrs[2][1]
+                self.next_page_url = 'http://spb.hh.ru' + attrs[2][1]
 
     def handle_data(self, data):
         if self.read_vacancy == 1:
