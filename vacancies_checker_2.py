@@ -39,8 +39,8 @@ class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
             if attrs[0] == ('class', 'b-vacancy-list-link b-marker-link'):
-                #print "URL:", attrs[1][1]
-                self.urls.append(attrs[1][1])
+                #print "URL:", attrs[2][1]
+                self.urls.append(attrs[2][1])
                 self.read_vacancy = 1
             if attrs[0][0] == 'href' and attrs[0][1].find('employer') == 1:
                 self.read_employer = 1
