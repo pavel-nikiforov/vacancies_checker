@@ -34,20 +34,28 @@ class MyHTMLParser(HTMLParser):
         self.employers = []
         self.urls = []
         self.next_page_url = None
+        self.attrib_to_search = []
         HTMLParser.__init__(self)
+
+    def value_of_attr(self, attr_name):
+        for i in range(len(self.attrib_to_search)):
+            if self.attrib_to_search[i][0] == attr_name:
+                return self.attrib_to_search[i][1]
+        return None
 
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
-            if attrs[0] == ('class', 'b-vacancy-list-link b-marker-link prosper-link'):
+            self.attrib_to_search = attrs
+            if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-title':
                 #print "URL:", attrs[2][1]
-                self.urls.append(attrs[2][1])
+                self.urls.append(self.value_of_attr('href'))
                 self.read_vacancy = 1
-            if attrs[0][0] == 'href' and attrs[0][1].find('employer') == 1:
+            if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-employer':
                 self.read_employer = 1
-            if attrs[0] == ('class', 'b-pager__next-text m-active-arrow HH-Pager-Controls-Next'):
+            if self.value_of_attr('data-qa') == 'pager-next':
                 #print "Next Page attrs:", attrs
                 #print "Next Page URL:", attrs[2][1]
-                self.next_page_url = 'http://spb.hh.ru' + attrs[2][1]
+                self.next_page_url = 'http://spb.hh.ru' + self.value_of_attr('href')
 
     def handle_data(self, data):
         if self.read_vacancy == 1:
