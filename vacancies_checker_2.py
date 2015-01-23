@@ -63,8 +63,8 @@ class MyHTMLParser(HTMLParser):
             self.vacancies.append(data)
             self.read_vacancy = 0
         if self.read_employer == 1:
-            #print "Employer: ", data
-            self.employers.append(data)
+            #print "Employer: ", data.lstrip().rstrip()
+            self.employers.append(data.lstrip().rstrip())
             self.read_employer = 0
 
     def fetch_result(self):
