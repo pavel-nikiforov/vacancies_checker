@@ -56,6 +56,11 @@ class MyHTMLParser(HTMLParser):
                 #print "Next Page attrs:", attrs
                 #print "Next Page URL:", attrs[2][1]
                 self.next_page_url = 'http://spb.hh.ru' + self.value_of_attr('href')
+        if tag == 'div':
+            self.attrib_to_search = attrs
+            if self.value_of_attr('class') == 'search-result-item__company':
+                self.read_employer = 1
+
 
     def handle_data(self, data):
         if self.read_vacancy == 1:
