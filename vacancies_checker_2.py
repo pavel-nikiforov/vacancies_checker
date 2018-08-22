@@ -1,12 +1,13 @@
 import sys
 import os.path
 import urllib2
+from cookielib import CookieJar
 from HTMLParser import HTMLParser
 import sqlite3
 import time
 from datetime import date
 
-vacancy_list_url = "http://spb.hh.ru/applicant/searchvacancyresult.xml?source=&text=&profArea=1&s=1.117&areaId=2&desireableCompensation=&compensationCurrencyCode=RUR&experience=&orderBy=2&searchPeriod=1&itemsOnPage=50"
+vacancy_list_url = "https://spb.hh.ru/search/vacancy?text=&specialization=1.117&area=2&salary=&currency_code=RUR&experience=doesNotMatter&order_by=publication_time&search_period=1&items_on_page=50&no_magic=true"
 accepted_keywords = ['QA', 'test', 'Test', 'quality','Quality', u'\u0442\u0435\u0441\u0442', u'\u0422\u0435\u0441\u0442', u'\u043A\u0430\u0447\u0435\u0441\u0442\u0432']
 
 unfiltered_vac_names = []
@@ -81,7 +82,10 @@ class MyHTMLParser(HTMLParser):
 
 def grabPage(page_url, page_name):
     print 'Getting page %s ... ' % page_name,
-    f = urllib2.urlopen(page_url)
+    request = urllib2.Request(page_url)
+    cj = CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    f = opener.open(request)
     rcode = f.getcode()
     print '%s' % rcode
     if rcode != 200:
