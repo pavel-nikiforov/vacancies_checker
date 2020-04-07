@@ -31,6 +31,7 @@ class MyHTMLParser(HTMLParser):
     def __init__(self):
         self.read_vacancy = 0
         self.read_employer = 0
+        self.last_read = None
         self.vacancies = []
         self.employers = []
         self.urls = []
@@ -55,25 +56,31 @@ class MyHTMLParser(HTMLParser):
                 self.read_employer = 1
             if self.value_of_attr('data-qa') == 'pager-next':
                 #print "Next Page attrs:", attrs
-                #print "Next Page URL:", attrs[2][1]
+                #print "Next Page URL index:", attrs[2][1]
                 self.next_page_url = 'http://spb.hh.ru' + self.value_of_attr('href')
-        if tag == 'div':
-            self.attrib_to_search = attrs
-            if self.value_of_attr('class') == 'search-result-item__company':
-                self.read_employer = 1
+                #print "Next Page URL:", self.next_page_url
 
 
     def handle_data(self, data):
         if self.read_vacancy == 1:
+            if self.last_read == 'vacancy':
+                print "Adding an empty employer"
+                self.employers.append("Anonymous Employer")
             #print "Vacancy: ", data
             self.vacancies.append(data)
             self.read_vacancy = 0
+            self.last_read = 'vacancy'
         if self.read_employer == 1:
             #print "Employer: ", data.lstrip().rstrip()
             self.employers.append(data.lstrip().rstrip())
             self.read_employer = 0
+            self.last_read = 'employer'
 
     def fetch_result(self):
+        #print "Fetch result"
+        #print "Vacancies: ", len(self.vacancies)
+        #print "Employers: ", len(self.employers)
+        #print "URLs     : ", len(self.urls)
         for i in range(len(self.vacancies)):
             unfiltered_vac_names.append(self.vacancies[i])
             unfiltered_emp_names.append(self.employers[i])
