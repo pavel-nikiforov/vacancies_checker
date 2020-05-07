@@ -358,6 +358,53 @@ def dumpUpdated(min_count=1):
     conn.close()
 
 
+def dumpRecent(rec_count=30):
+    print 'Dumping recent vacancies ...'
+
+    if not isDatabaseOK():
+        sys.exit()
+
+    conn = sqlite3.connect("vacancies.database")
+    cursor = conn.cursor()
+
+    select_data_cmd = """
+        select
+              VacancyName,
+              EmployerName,
+              VacancyURL,
+              VacancyLastUpdated,
+              VacancyDate,
+              VacancyUpdatesCount
+        from VACANCIES
+        natural join EMPLOYERS
+        order by VacancyLastUpdated desc,
+                 VacancyDate desc 
+        limit ?
+    """
+
+    try:
+        print 'Retrieving data ... ',
+        cursor.execute(select_data_cmd,(str(rec_count),))
+        #cursor.execute(select_data_cmd,)
+        updated_vacancies = cursor.fetchall()
+        print 'done'
+    except Exception as e:
+        print 'Ops!\n' + str(e)
+        conn.close()
+        sys.exit()
+
+    for vacancy in updated_vacancies:
+        print '---'
+        print 'vacancy:    ' + vacancy[0].encode('utf-8')
+        print 'employer:   ' + vacancy[1].encode('utf-8')
+        print 'url:        ' + vacancy[2]
+        print 'updated:    ' + vacancy[3]
+        print 'placed:     ' + vacancy[4]
+        print 'was updated ' + str(vacancy[5]) + ' times'
+
+    conn.close()
+
+
 def storeNewVacancies():
     print 'Saving new vacancies into database ...'
 
@@ -507,6 +554,12 @@ if __name__ == '__main__':
             else:
                 dumpUpdated()
             sys.exit()
+        if sys.argv[1] == '--dump-recent':
+            if len(sys.argv) == 3:
+                dumpRecent(sys.argv[2])
+            else:
+                dumpRecent(30)
+            sys.exit()
         if sys.argv[1] == '-s':
             silent_mode = True
         else:
@@ -515,6 +568,7 @@ if __name__ == '__main__':
             print "--dump = print vacancies list"
             print "--dump-employers = print employers list"
             print "--dump-updated N = print vacancies updated at least N times"
+            print "--dump-recent N = print N recently updated vacancies"
             sys.exit()
 
     grabVacancies()
