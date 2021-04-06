@@ -101,7 +101,8 @@ def grabPage(page_url, page_name):
         sys.exit()
 
     content = f.read()
-    dec_content = content.decode('utf-8')
+    filtered_content = content.replace("<!-- -->", "")
+    dec_content = filtered_content.decode('utf-8')
     f.close()
 
     parser = MyHTMLParser()
