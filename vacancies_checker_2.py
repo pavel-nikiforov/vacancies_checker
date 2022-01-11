@@ -49,10 +49,18 @@ class MyHTMLParser(HTMLParser):
         if tag == 'a':
             self.attrib_to_search = attrs
             if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-title':
-                #print "URL:", attrs[2][1]
-                self.urls.append(self.value_of_attr('href'))
-                self.read_vacancy = 1
+                #print "URL:", attrs[3][1]
+                raw_url = self.value_of_attr('href')
+                url_without_params = raw_url.split('?')[0]
+                last_url_added = self.urls[-1] if len(self.urls) > 0 else ''
+                #print 'URL:', url_without_params
+                #print 'last', last_url_added
+                if url_without_params != last_url_added:
+                    #print 'adding'
+                    self.urls.append(url_without_params)
+                    self.read_vacancy = 1
             if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-employer':
+                #print "Employer tag"
                 self.read_employer = 1
             if self.value_of_attr('data-qa') == 'pager-next':
                 #print "Next Page attrs:", attrs
@@ -64,7 +72,7 @@ class MyHTMLParser(HTMLParser):
     def handle_data(self, data):
         if self.read_vacancy == 1:
             if self.last_read == 'vacancy':
-                print "Adding an empty employer"
+                #print "Adding an empty employer"
                 self.employers.append("Anonymous Employer")
             #print "Vacancy: ", data
             self.vacancies.append(data)
@@ -102,6 +110,7 @@ def grabPage(page_url, page_name):
 
     content = f.read()
     filtered_content = content.replace("<!-- -->", "")
+    #print filtered_content
     dec_content = filtered_content.decode('utf-8')
     f.close()
 
