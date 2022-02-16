@@ -32,6 +32,7 @@ class MyHTMLParser(HTMLParser):
         self.read_vacancy = 0
         self.read_employer = 0
         self.last_read = None
+        self.need_to_read_button = False
         self.vacancies = []
         self.employers = []
         self.urls = []
@@ -55,10 +56,24 @@ class MyHTMLParser(HTMLParser):
                 last_url_added = self.urls[-1] if len(self.urls) > 0 else ''
                 #print 'URL:', url_without_params
                 #print 'last', last_url_added
-                if url_without_params != last_url_added:
+                ad_url = "https://hhcdn.ru/click"
+                if url_without_params == ad_url:
+                    self.need_to_read_button = True
+                    self.read_vacancy = 1
+                elif url_without_params != last_url_added:
                     #print 'adding'
                     self.urls.append(url_without_params)
                     self.read_vacancy = 1
+            if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy_response':
+                if self.need_to_read_button is True:
+                    btn_url = self.value_of_attr('href')
+                    #href="/applicant/vacancy_response?vacancyId=51167623&hhtmFrom=vacancy_search_list"
+                    start = btn_url.find('vacancyId=') + 10
+                    end = btn_url.find('&hhtmF')
+                    vac_id = btn_url[start:end]
+                    vac_url = 'https://spb.hh.ru/vacancy/' + vac_id
+                    self.urls.append(vac_url)
+                    self.need_to_read_button = False
             if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-employer':
                 #print "Employer tag"
                 self.read_employer = 1
