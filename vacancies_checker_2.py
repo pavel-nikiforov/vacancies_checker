@@ -49,7 +49,7 @@ class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
             self.attrib_to_search = attrs
-            if self.value_of_attr('data-qa') == 'vacancy-serp__vacancy-title':
+            if self.value_of_attr('data-qa') == 'serp-item__title':
                 #print "URL:", attrs[3][1]
                 raw_url = self.value_of_attr('href')
                 url_without_params = raw_url.split('?')[0]
