@@ -430,6 +430,79 @@ def dumpRecent(rec_count=30):
     conn.close()
 
 
+def showStats():
+    employers_total = 0
+    vacancies_total = 0
+    last_update_date = 'None'
+
+
+    if not isDatabaseOK():
+        sys.exit()
+
+    conn = sqlite3.connect("vacancies.database")
+    cursor = conn.cursor()
+
+    select_employers_count = """
+        select
+              count(*)
+        from EMPLOYERS
+    """
+
+    select_vacancies_count = """
+        select
+              count(*)
+        from VACANCIES
+    """
+
+    select_last_update_date = """
+        select
+              max(VacancyLastUpdated)
+        from VACANCIES
+    """
+
+    try:
+        print 'Collecting stats ... ',
+        cursor.execute(select_employers_count)
+        employers_total = cursor.fetchall()
+        if len(employers_total) > 0:
+            employers_total = employers_total[0][0]
+        else:
+            employers_total = 0
+
+        cursor.execute(select_vacancies_count)
+        vacancies_total = cursor.fetchall()
+        if len(vacancies_total) > 0:
+            vacancies_total = vacancies_total[0][0]
+        else:
+            vacancies_total = 0
+
+        cursor.execute(select_last_update_date)
+        last_update_date = cursor.fetchall()
+        if len(last_update_date) > 0:
+            last_update_date = last_update_date[0][0]
+        else:
+            last_update_date = 'None'
+
+        conn.close()
+        print 'done'
+    except Exception as e:
+        print 'Ops!\n' + str(e)
+        conn.close()
+        sys.exit()
+
+    print ''
+    print ''
+    print 'Currently in Database'
+    print ''
+    print '---'
+    print 'employers:   ' + str(employers_total)
+    print 'vacancies:   ' + str(vacancies_total)
+    print 'last update: ' + last_update_date
+    print '---'
+    print ''
+
+
+
 def storeNewVacancies():
     print 'Saving new vacancies into database ...'
 
@@ -585,6 +658,9 @@ if __name__ == '__main__':
             else:
                 dumpRecent(30)
             sys.exit()
+        if sys.argv[1] == '--stats' or sys.argv[1] == '--stat':
+            showStats()
+            sys.exit()
         if sys.argv[1] == '-s':
             silent_mode = True
         else:
@@ -594,6 +670,7 @@ if __name__ == '__main__':
             print "--dump-employers = print employers list"
             print "--dump-updated N = print vacancies updated at least N times"
             print "--dump-recent N = print N recently updated vacancies"
+            print "--stats = print statistical data about db"
             sys.exit()
 
     grabVacancies()
