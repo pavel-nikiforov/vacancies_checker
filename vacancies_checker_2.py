@@ -57,7 +57,7 @@ class MyHTMLParser(HTMLParser):
                 #print 'URL:', url_without_params
                 #print 'last', last_url_added
                 ad_url = "https://hhcdn.ru/click"
-                if url_without_params == ad_url:
+                if url_without_params[-6:] == ad_url[-6:]:
                     self.need_to_read_button = True
                     self.read_vacancy = 1
                 elif url_without_params != last_url_added:
@@ -125,7 +125,7 @@ def grabPage(page_url, page_name):
 
     content = f.read()
     filtered_content = content.replace("<!-- -->", "")
-    #print filtered_content
+    print filtered_content
     dec_content = filtered_content.decode('utf-8')
     f.close()
 
