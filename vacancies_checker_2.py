@@ -115,7 +115,7 @@ def grabPage(page_url, page_name):
     request = urllib2.Request(page_url)
     cj = CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:64.0) Gecko/20100101 Firefox/64.0')]
+    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0')]
     f = opener.open(request)
     rcode = f.getcode()
     print '%s' % rcode
@@ -125,7 +125,7 @@ def grabPage(page_url, page_name):
 
     content = f.read()
     filtered_content = content.replace("<!-- -->", "")
-    print filtered_content
+    #print filtered_content
     dec_content = filtered_content.decode('utf-8')
     f.close()
 
